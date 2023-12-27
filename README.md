@@ -51,5 +51,18 @@ SQL API 는 R2DBC 와 QueryDSL 을 적용 하도록 한다.
 
 
 ### 2. 환경 구성
+이 프로젝트의 또하나의 목적은 최소한의 준비 만으로 개인의 독립된 개발환경을 구촉 하고 모든 팀원이 공유 할 수 있는 개발 환경을 공유 할 수 있도록 하는 것이다.   
+이를 위해서 가능한 설치형 도구의 구성은 최소화 하고 docker 환경에 환경을 구성 할 것이다.
+이 문서를 보고 있는 사람들이라면 eclipse, vscode 또는 Intelli J 등과 같은 코드 편집도구에 대한 설명은 불필요 할 것이다.
+사전에 만드시 필요한 준비 사항은 jdk, node.js 와 docker, docker-compose 이다.
+jdk 와 node.js 는 SDKMAN, nvm 과 같은 버전 관리도구를 사용해 설치 할 것을 권장한다.
+> [SDKMAN! the Sofrware Development Kit Manager](https://sdkman.io/)   
+> [NVM - Node Version Manager](https://github.com/nvm-sh/nvm)   
+
+또한 docker과 docker-compose 가 설치 되어 있다고 가정하고 진행 한다.
+> [docker docs](https://docs.docker.com/)   
+
+> [docker 를 이용한 DBMS 구성](./documents/chapter02-01.md)
+
 
 ### 3. Project Scafolding

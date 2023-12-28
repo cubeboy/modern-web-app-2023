@@ -73,3 +73,9 @@ Application 작성을 위해서 Front/Back End 코드의 뼈대를 작성 한다
 
 > [create back-end scaffold with spring-boot](./documents/chapter03-01.md)   
 > [create front-end scaffold with vue3 & vuetify3](./documents/chapter03-02.md)   
+
+### 4. Create Register Page
+먼저 회원가입 페이지를 만든다.   
+코드 구현내용은 chapter04 branch 내용을 참조 한다.   
+그러나 vites 를 이용한 테스트코드 작성에 대한 부분은 아래에 자세하게 기술한다.   
+> [front-end unit test by vites](./documents/chapter04-01.md)

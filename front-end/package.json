@@ -16,7 +16,8 @@
     "@mdi/font": "^7.4.47",
     "pinia": "^2.1.7",
     "vue": "^3.3.11",
-    "vue-router": "^4.2.5"
+    "vue-router": "^4.2.5",
+    "vuetify": "^3.4.8"
   },
   "devDependencies": {
     "@playwright/test": "^1.40.1",
@@ -31,7 +32,6 @@
     "resize-observer-polyfill": "^1.5.1",
     "vite": "^5.0.10",
     "vite-plugin-vuetify": "^2.0.1",
-    "vitest": "^1.0.4",
-    "vuetify": "^3.4.8"
+    "vitest": "^1.0.4"
   }
 }

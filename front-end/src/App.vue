@@ -1,9 +1,11 @@
 <script setup>
-
+import {RouterView} from 'vue-router'
 </script>
 
 <template>
   <div id="root">
-    Task Agile
+    <v-app id="landingZone">
+      <RouterView />
+    </v-app>
   </div>
 </template>

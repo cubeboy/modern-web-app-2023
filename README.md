@@ -68,4 +68,8 @@ docker 를 이용한 개발 DBMS 구성은 아래 내용을 참고 한다.
 
 
 ### 3. Project Scafolding
-> [create back-end scaffold with spring-boot](./documents/chapter03-01.md)
+Application 작성을 위해서 Front/Back End 코드의 뼈대를 작성 한다.   
+모든 과정은 터미널 환경(bash, PowerShell) 에서 진행 하며 Windows 환경에서도 가능하다면 WSL2 를 이용해서 진행 하기를 권한다.   
+
+> [create back-end scaffold with spring-boot](./documents/chapter03-01.md)   
+> [create front-end scaffold with vue3 & vuetify3](./documents/chapter03-02.md)   

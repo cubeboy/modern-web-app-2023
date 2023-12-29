@@ -1,7 +1,12 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, reactive } from 'vue'
 
 const errorMessage = ref('')
+const form = reactive({
+  username: '',
+  emailAddress: '',
+  password: ''
+})
 </script>
 
 <template>
@@ -23,9 +28,9 @@ const errorMessage = ref('')
               {{errorMessage}}
             </v-alert>
             <v-form>
-              <v-text-field label="Username" prepend-inner-icon="mdi-account-circle-outline" variant="underlined" required></v-text-field>
-              <v-text-field label="Email Address" prepend-inner-icon="mdi-email-outline" variant="underlined" required></v-text-field>
-              <v-text-field label="Password" prepend-inner-icon="mdi-lock-outline" variant="underlined" type="password" required></v-text-field>
+              <v-text-field id="username" v-model="form.username" label="Username" prepend-inner-icon="mdi-account-circle-outline" variant="underlined" required></v-text-field>
+              <v-text-field id="emailAddress" v-model="form.emailAddress" label="Email Address" prepend-inner-icon="mdi-email-outline" variant="underlined" required></v-text-field>
+              <v-text-field id="password" v-model="form.password" label="Password" prepend-inner-icon="mdi-lock-outline" variant="underlined" type="password" required></v-text-field>
               <v-btn color="primary" block>Create Account</v-btn>
             </v-form>
             <div class="ma-2 text-left">

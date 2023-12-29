@@ -95,3 +95,56 @@ npm run test:unit
    Start at  11:22:06
    Duration  1.24s
 ```
+vitest 는 한번 실행해 두면 code 를 수정하고 저장 할 때 마다 자동으로 테스트를 수행한다.   
+   
+첫번째 테스트로 v-alert 이 화면상에 있는지 확인 하는 코드를 추가했다.   
+> 가입중 오류 메시지 표시부분은 초기에 비활성 상태여야 한다.   
+
+테스트 코드를 작성 할 때는 전체 기능을 한번에 테스트 하지 말고 최소한의 기능 단위로 테스트 코드를 작성하게 해서 가능하면 작은 단위로 테스를 수행 할 수 있도록 한다.   
+테스트 코드는 한번 작성하는 것으로 끝나지 않고 App 가 유지되고 있는 동안 버그 수정이나 기능이 추가 될때마다 테스트도 더욱 정밀하게 유지 될 수 있도록 해야 한다.   
+'초기 화면 구성요소 유효성 검사' 항목은 '오류 메시지  초기 표시는 비활성' 과 '모든 필드 초기 입력 값은 빈 값' 항목으로 분리해서 진행 하도록 한다.   
+   
+화면상의 각 필드 초기값을 점검하는 코드를 추가 한다.
+```javascript
+
+describe('RegisterPage', () => {
+  let wrapper
+  let usernameField
+  let emailAddressField
+  let passwordField
+
+  const router = createRouter({
+    history: createWebHistory(),
+    routes: []
+  })
+
+  beforeEach(() => {
+    wrapper = mount(RegisterPage, {
+      global: {
+        plugins: [vuetify, router]
+      }
+    })
+    usernameField = wrapper.find('#username')
+    emailAddressField = wrapper.find('#emailAddress')
+    passwordField = wrapper.find('#password')
+  })
+
+  it('오류 메시지  초기 표시는 비활성', () => {
+    expect(wrapper.find('img').attributes().src).toEqual('/static/images/logo.png')
+    expect(wrapper.find('.v-alert').exists()).toBe(false)
+  })
+
+  it('모든 필드 초기 입력 값은 빈 값', () => {
+    expect(usernameField.element.value).toEqual('')
+    expect(emailAddressField.element.value).toEqual('')
+    expect(passwordField.element.value).toEqual('')
+  })
+})
+```
+RegisterPage 를 객체화 하고 객체 내부에서 html element 를 찾는 메소드(find)의 작동은 CSS Selector 을 사용한다.   
+> 초기 화면에서는 모든 필드 입력 값이 빈 값이어야 한다.   
+   
+이제 데이터 모델을 추가하고 초기 설정을 추가한다.
+이후에 데이터 모델을 화면 요소에 바인딩 하고 테스트 하는 코드는 chapter04 branch 의 코드를 참조한다.
+> 데이터 모델 필드와 화면 필드의 값이 일치 해야 한다.   
+   

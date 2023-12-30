@@ -7,13 +7,64 @@ const form = reactive({
   emailAddress: '',
   password: ''
 })
+const formValid = ref(false)
+
+const USERNAME_LENGTH_MIN = 4
+const USERNAME_LENGTH_MAX = 20
+const EMAILADDRESS_LENGTH_MAX = 100
+const PASSWORD_LENGTH_MIN = 6
+const PASSWROD_LENGTH_MAX = 128
+const formRules = reactive({
+  username: [
+    (value) => {
+      if (value.trim() != '') return true
+      return 'Username is required'
+    },
+    (value) => {
+      if (!/[^a-z0-9]/.test(value)) return true
+      return 'Username can only contain letters and numbers'
+    },
+    (value) => {
+      if (value.length >= USERNAME_LENGTH_MIN && value.length <= USERNAME_LENGTH_MAX) return true
+      return `Username must have at least ${USERNAME_LENGTH_MIN} and to maximum ${USERNAME_LENGTH_MAX}`
+    }
+  ],
+  emailAddress: [
+    (value) => {
+      if (value.trim() != '') return true
+      return 'Email address is required'
+    },
+    (value) => {
+      if (/[a-z0-9]+@[a-z]+\.[a-z]{2,3}/.test(value)) return true
+      return 'This is not a valid email address'
+    },
+    (value) => {
+      if (value.trim().length <= EMAILADDRESS_LENGTH_MAX) return true
+      return `Email address is too long. It can contains maximium ${EMAILADDRESS_LENGTH_MAX} letters.`
+    }
+  ],
+  password: [
+    (value) => {
+      if (value.trim() != '') return true
+      return 'Password is required'
+    },
+    (value) => {
+      if (/((?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9])(?=.{6,}))|((?=.*[a-z])(?=.*[A-Z])(?=.*[^A-Za-z0-9])(?=.{8,}))/.test(value)) return true
+      return `Password must have at least ${PASSWORD_LENGTH_MIN} and to maximum ${PASSWROD_LENGTH_MAX}, must contains big charter, small charter and number`
+    }
+  ]
+})
+
+const submitForm = async () => {
+  if (!formValid.value) return
+}
 </script>
 
 <template>
-  <v-container fluid>
+  <v-container >
     <v-row justify="center">
-      <v-col cols="12" sm="8" md="4">
-        <v-card max-width="344" class="mt-10">
+      <v-col cols="auto">
+        <v-card max-width="320" class="mt-10">
           <v-card-title>
             <div class="my-2 text-center">
               <v-img src="/static/images/logo.png" class="logo"></v-img>
@@ -27,11 +78,34 @@ const form = reactive({
             <v-alert v-if="errorMessage" icon="mdi-alert-circle-outline" density="compact" color="deep-orange-lighten-5" border>
               {{errorMessage}}
             </v-alert>
-            <v-form>
-              <v-text-field id="username" v-model="form.username" label="Username" prepend-inner-icon="mdi-account-circle-outline" variant="underlined" required></v-text-field>
-              <v-text-field id="emailAddress" v-model="form.emailAddress" label="Email Address" prepend-inner-icon="mdi-email-outline" variant="underlined" required></v-text-field>
-              <v-text-field id="password" v-model="form.password" label="Password" prepend-inner-icon="mdi-lock-outline" variant="underlined" type="password" required></v-text-field>
-              <v-btn color="primary" block>Create Account</v-btn>
+            <v-form @submit.prevent="submitForm()" v-model="formValid">
+              <v-text-field
+                id="username"
+                v-model="form.username"
+                :rules="formRules.username"
+                label="Username"
+                prepend-inner-icon="mdi-account-box-outline"
+                variant="underlined" required>
+              </v-text-field>
+              <v-text-field
+                id="emailAddress"
+                v-model="form.emailAddress"
+                :rules="formRules.emailAddress"
+                label="Email Address"
+                prepend-inner-icon="mdi-email-outline"
+                variant="underlined" required>
+              </v-text-field>
+              <v-text-field
+                id="password"
+                v-model="form.password"
+                :rules="formRules.password"
+                label="Password"
+                prepend-inner-icon="mdi-lock-outline"
+                variant="underlined"
+                type="password"
+                required>
+              </v-text-field>
+              <v-btn color="primary" type="submit" block>Create Account</v-btn>
             </v-form>
             <div class="ma-2 text-left">
               <p>By clicking “Create account”, you agree to our <a href="#">terms of service</a> and <a href="#">privacy policy</a>.</p>

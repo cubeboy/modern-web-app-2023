@@ -14,10 +14,10 @@
   },
   "dependencies": {
     "@mdi/font": "^7.4.47",
+    "axios": "^1.6.3",
     "pinia": "^2.1.7",
     "vue": "^3.3.11",
-    "vue-router": "^4.2.5",
-    "vuetify": "^3.4.8"
+    "vue-router": "^4.2.5"
   },
   "devDependencies": {
     "@playwright/test": "^1.40.1",
@@ -27,11 +27,14 @@
     "@vue/test-utils": "^2.4.3",
     "eslint": "^8.49.0",
     "eslint-plugin-vue": "^9.17.0",
+    "fetch-mock": "^9.11.0",
     "jsdom": "^23.0.1",
+    "moxios": "^0.4.0",
     "prettier": "^3.0.3",
     "resize-observer-polyfill": "^1.5.1",
     "vite": "^5.0.10",
     "vite-plugin-vuetify": "^2.0.1",
-    "vitest": "^1.0.4"
+    "vitest": "^1.0.4",
+    "vuetify": "^3.4.8"
   }
 }

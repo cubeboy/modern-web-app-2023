@@ -1,5 +1,10 @@
 <script setup>
 import { ref, reactive } from 'vue'
+import { useRouter } from 'vue-router'
+
+import registrationService from '../services/registration'
+
+const router = useRouter()
 
 const errorMessage = ref('')
 const form = reactive({
@@ -49,14 +54,22 @@ const formRules = reactive({
       return 'Password is required'
     },
     (value) => {
-      if (/((?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9])(?=.{6,}))|((?=.*[a-z])(?=.*[A-Z])(?=.*[^A-Za-z0-9])(?=.{8,}))/.test(value)) return true
-      return `Password must have at least ${PASSWORD_LENGTH_MIN} and to maximum ${PASSWROD_LENGTH_MAX}, must contains big charter, small charter and number`
+      if (/^(?=(?:.*[A-Za-z]){2})(?=.*\d).{6,128}$/.test(value)) return true
+      return `Password must have at least ${PASSWORD_LENGTH_MIN} and to maximum ${PASSWROD_LENGTH_MAX}, must contains big charter or small charter and number`
     }
   ]
 })
 
 const submitForm = async () => {
   if (!formValid.value) return
+
+  return registrationService.register(form)
+    .then(() => {
+      router.push({ name: 'LoginPage' })
+    })
+    .catch(error => {
+      errorMessage.value = 'Failed to register user. ' + error.message
+    })
 }
 </script>
 

@@ -156,3 +156,111 @@ RegisterPage 를 객체화 하고 객체 내부에서 html element 를 찾는 �
 > password 는 최소 6자 이상 최대 128자 이하이며 필수입력이다.   
 > password 는 영문자 1개 이상 과 숫자 1개 이상이 반드시 포함되어야 한다.   
 
+이제 username과 emailAddress 의 중복을 처리 할 차례이다.   
+database 의 정보를 확인 해야 하는 동작은 client 측의 javascript 코드로는 검증 할 수없다.   
+하지만 반환 값에 대한 약속만 정해 진다면 오류가 발생하는 경우를 가상으로 구현해서 테스트 할 수 있다.   
+단위 테스트 단계에서는 잘되거나 잘못되는 경우를 mockup 으로 구현하고 실제 서버 통신과에서의 처리 결과 학인은 e2e 테스트 단계에서 만족 시킨다.   
+
+먼저 api 통신을 가상화 해주는 axios와 axios mockup 라이브러리를 설치하자.   
+네이티브 javascript method 인 fetch를 사용할 수도 있지만 다양한 브라우저 지원과 추가적인 보안기능 (XSRF Proejction), json변환 기능등을 지원 하는 axios 가 여러 편리 함을 제공 하므로 axios 를 사용한다.   
+moxios 는 axios의 api 호출을 가로 채서 목업 데이터로 반환 하게 해주는 테스트용 핼퍼 라이브러리이다.
+
+아래 명령어로 설치하자.   
+```bash
+npm install axios --save
+npm install -D moxios
+```
+axois 로 api 를 호출 시 해야 하는 반복 작업을 미리 정의하는 커스텀 axios 를 정의한다.   
+src/plugins/defaultAxios.js 파일을 만들고 아래와 같이 정의 한다.   
+```javascript
+import axios from 'axios'
+
+const defaultAxios = axios.create(
+  {
+    baseURL: '/api'
+  }
+)
+defaultAxios.defaults.headers.common.Accept = 'application/json'
+defaultAxios.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    return Promise.reject(error)
+  }
+)
+
+export default defaultAxios
+```
+src/services/registration.js 파일을 만들고 back-end api 서비스를 호출하는 기능을 정의한다.
+```javascript
+import defaultAxios from '../plugins/defaultAxios'
+
+export default {
+  register: (userInfo) => {
+    return new Promise((resolve, reject) => {
+      defaultAxios.post('/registrations', userInfo)
+        .then(({ data }) => {
+          resolve(data)
+        })
+        .catch((error) => {
+          reject(error.response.data)
+        })
+    })
+  }
+}
+```
+앞서 정의한 defaultAxios 적용 된 부분을 주목하자.   
+지금은 이 코드가 제대로 작동하는지는 관심 갖지 말자.   
+아직은 back-end 서비스가 구현 되지 않았으니 확인할 방법도 없다.   
+   
+이제 다시 테스트 코드로 돌아 와서 moxios 를 이용한 코드 작업을 하자.   
+```javascript
+import { describe, it, vi, expect, beforeEach, afterEach } from 'vitest'
+import moxios from 'moxios'
+import defaultAxios from '@/plugins/defaultAxios'
+// ... 생략
+describe('RegisterPage', () => {
+  // ... 생략
+  let registerSpy
+
+  beforeEach(() => {
+    // ... 생략
+    registerSpy = vi.spyOn(registrationService, 'register')
+
+    moxios.install(defaultAxios)
+  })
+
+  afterEach(() => {
+    registerSpy.mockReset()
+    registerSpy.mockRestore()
+
+    moxios.uninstall(defaultAxios)
+  })
+})
+```
+새롭게 추가된 spyOn 이라는 메소드가 있다.
+spy 는 특정 객체의 특정 메소드의 호출 상태를 감시 하는 기능을 제공한다.
+테스트를 할때는 RegisterPage 가 제공하는 submitForm 을 호출하지만 내부에서 호출되는 registrationService.register 메소드의 호출 상태는 확인 할 수 없다.   
+spy 는 해당 메소들르 추적 감시해서 메소드의 호출 여부를 확인 할 수 있게 해준다.   
+사용법은 RegisterPage.spec.js 의 registerSpy 의 상태를 확인하는 코드를 참조 한다.   
+
+moxios 사용하기 위해서는 명시적으로 axios 호출을 가로채도록 선언 해 주어야 하며 install 메소드는 이를 명시적으로 처리하는 함수이다.   
+afterEach 에서 spy 와 moxios 를 reset 또는 uninstall 해 주는 것은 다른 테스트 진행에 영향을 주지 않도록 하기 위해서 테스트 완료 후 초기화 해 주는 작업이다.   
+   
+이제 [username 중복검사] 를 확인 해 보자.   
+가장 중요한 코드는 아래 코드이다.
+```javascript
+    moxios.stubRequest('/registrations', {
+      status: 409,
+      response: {
+        message: 'username is already exists.'
+      }
+    })
+```
+'/registrations' REST Api 호출에 대한 가상 결과를 위와 같이 정의 한다.
+이제 registrationService.register 호출에 대해서는 http status 409 와 {message: 'username is already exists.'} 가 반드시 반환 된다.   
+이제 호출 결과에 대해서 reject 가 호출 되는지, 오류 메시지 표시 위치에 메시지가 표시되는지 확인 할 수 있다.   
+> usrname, emailAddress 는 전체 App 에서 유일 해야 하며 중복되는 경우 명확한 오류 메시지가 표시 되어야 한다.   
+> 기타 회원 가입중 오류가 발생 하는 경우 오류 메시지를 표시 한다.   
+   
+이제 목표한 오류 검증 사항에 대해서 테스트가 완료 되었으니 마지막으로 정상적으로 사용자 등록 처리를 확인 하고 마무리 하자.
+   

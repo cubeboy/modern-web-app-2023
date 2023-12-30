@@ -1,10 +1,13 @@
-import { describe, it, vi, expect, beforeEach } from 'vitest'
+import { describe, it, vi, expect, beforeEach, afterEach } from 'vitest'
 
 import { mount } from '@vue/test-utils'
 import { createRouter, createWebHistory } from 'vue-router'
+import moxios from 'moxios'
+import defaultAxios from '@/plugins/defaultAxios'
 
-import RegisterPage from '../RegisterPage.vue'
 import vuetify from '../../plugins/vuetify'
+import RegisterPage from '../RegisterPage.vue'
+import registrationService from '@/services/registration'
 
 // eslint-disable-next-line no-undef
 global.ResizeObserver = require('resize-observer-polyfill')
@@ -16,6 +19,7 @@ describe('RegisterPage', () => {
   let passwordField
   let submitBtn
   let vForm
+  let registerSpy
 
   const router = createRouter({
     history: createWebHistory(),
@@ -33,6 +37,16 @@ describe('RegisterPage', () => {
     passwordField = wrapper.find('#password')
     submitBtn = wrapper.find('form button[type="submit"]')
     vForm = wrapper.findComponent({name: 'v-form'})
+    registerSpy = vi.spyOn(registrationService, 'register')
+
+    moxios.install(defaultAxios)
+  })
+
+  afterEach(() => {
+    registerSpy.mockReset()
+    registerSpy.mockRestore()
+
+    moxios.uninstall(defaultAxios)
   })
 
   it('오류 메시지  초기 표시는 비활성', () => {
@@ -55,6 +69,7 @@ describe('RegisterPage', () => {
     expect(form.username).toEqual('')
     expect(form.emailAddress).toEqual('')
     expect(form.password).toEqual('')
+    expect(wrapper.vm.errorMessage).toEqual('')
 
     form.username = txtUsername
     form.emailAddress = txtEmailAddress
@@ -106,6 +121,7 @@ describe('RegisterPage', () => {
     expect(valid.valid).toBe(false)
     expect(usernameError).not.toBeUndefined()
     expect(usernameError.errorMessages).toContain('Username must have at least 4 and to maximum 20')
+    expect(registerSpy).not.toHaveBeenCalled()
   })
 
   it('emailAddress 유효성 검사', async () => {
@@ -140,6 +156,7 @@ describe('RegisterPage', () => {
     expect(valid.valid).toBe(false)
     expect(emailAddressError).not.toBeUndefined()
     expect(emailAddressError.errorMessages).toContain('This is not a valid email address')
+    expect(registerSpy).not.toHaveBeenCalled()
   })
 
   it('password 유효성 검사', async () => {
@@ -165,7 +182,7 @@ describe('RegisterPage', () => {
     passwordError = valid.errors.find(obj => obj.id === 'password')
     expect(valid.valid).toBe(false)
     expect(passwordError).not.toBeUndefined()
-    expect(passwordError.errorMessages).toContain('Password must have at least 6 and to maximum 128, must contains big charter, small charter and number')
+    expect(passwordError.errorMessages).toContain('Password must have at least 6 and to maximum 128, must contains big charter or small charter and number')
 
     form.password = 'abcdefghij'
     await wrapper.vm.$nextTick()
@@ -173,6 +190,67 @@ describe('RegisterPage', () => {
     passwordError = valid.errors.find(obj => obj.id === 'password')
     expect(valid.valid).toBe(false)
     expect(passwordError).not.toBeUndefined()
-    expect(passwordError.errorMessages).toContain('Password must have at least 6 and to maximum 128, must contains big charter, small charter and number')
+    expect(passwordError.errorMessages).toContain('Password must have at least 6 and to maximum 128, must contains big charter or small charter and number')
+    expect(registerSpy).not.toHaveBeenCalled()
+  })
+
+  it('username 중복 검사', async () => {
+    const txtUsername = 'duplication'
+    const txtEmailAddress = 'testuser@taskagile.com'
+    const txtPassword = 'passwrod12'
+
+    moxios.stubRequest('/registrations', {
+      status: 409,
+      response: {
+        message: 'username is already exists.'
+      }
+    })
+
+    const form = wrapper.vm.form
+    form.username = txtUsername
+    form.emailAddress = txtEmailAddress
+    form.password = txtPassword
+    await wrapper.vm.$nextTick()
+    let {valid} = await vForm.vm.validate()
+    expect(valid).toBe(true)
+
+    await wrapper.vm.submitForm()
+    expect(registerSpy).toHaveBeenCalledWith(form)
+    await wrapper.vm.$nextTick()
+
+    expect(wrapper.find('.v-alert').exists()).toBe(true)
+    expect(wrapper.vm.errorMessage).toEqual('Failed to register user. username is already exists.')
+  })
+
+  it('사용자 회원 등록 성공', async () => {
+    const txtUsername = 'registeruser'
+    const txtEmailAddress = 'testuser@taskagile.com'
+    const txtPassword = 'Passwrod12!@'
+
+    moxios.stubRequest('/registrations', {
+      status: 201,
+      response: {
+        message: 'success'
+      }
+    })
+
+    const stub = vi.fn()
+    router.push = stub
+
+    const form = wrapper.vm.form
+    form.username = txtUsername
+    form.emailAddress = txtEmailAddress
+    form.password = txtPassword
+    await wrapper.vm.$nextTick()
+    let {valid} = await vForm.vm.validate()
+    expect(valid).toBe(true)
+
+    await wrapper.vm.submitForm()
+    expect(registerSpy).toHaveBeenCalledWith(form)
+    await wrapper.vm.$nextTick()
+
+    console.log(`v-laert exists ===>> ${wrapper.vm.errorMessage}`)
+    expect(wrapper.find('.v-alert').exists()).toBe(false)
+    expect(stub).toHaveBeenCalledWith({ name: 'LoginPage' })
   })
 })

@@ -68,28 +68,36 @@ RegistrationPayloadTests > username 은 필수입력, 최소 4글자 이상, 최
 ```
 FAILED 메시지를 확인 할 수 있다.   
 이제 테스트를 통과 할 수 있는 코드를 만든다.   
-
 ```kotlin
 class RegistrationPayload(
-  usernameParam:String,
-  emailAddressParam:String,
-  passwordParam:String
-) {
-  @Pattern(regexp="^[a-zA-Z0-9]{4,20}\$",
+  @field:Pattern(regexp="^[a-zA-Z0-9]{4,20}$",
     message = REGISTER_USERNAME_INVALID)
-  val username:String
-// 생략 ...
+  val username:String,
 
-  init {
-    username = usernameParam.trim()
-    emailAddress = emailAddressParam.trim()
-    password = passwordParam.trim()
-  }
-}
+  @field:Pattern(regexp = "^(?=.{6,100}$)[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$",
+    message = REGISTER_EMAIL_ADDRESS_INVALID )
+  val emailAddress:String,
+
+  @field:Pattern(regexp = "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[!@#$%^&*()-_=+\\[\\]{}|;:'\",.<>?/])[A-Za-z\\d!@#$%^&*()-_=+\\[\\]{}|;:'\",.<>?/]{6,128}$",
+    message = REGISTER_PASSWORD_INVALID)
+  val password:String
+)
 ```
 이제 테스트를 다시 실행하면 테스트를 통확 하고 BUILD SUCCESSFUL 메시지를 학인 할 수 있다.   
 나머지 필드의 유효성 검사는 chapter05 branch 의 코드를 참조 한다.   
+
+**mockk 를 이용한 컨트롤러 테스트**   
+payload 의 유효성이 WebController 와의 통신에서 잘 작동하늕 확인 하기위한 Test Unit 을 만들기 전에 mockk lib 를 추가 한다.   
+mockk 는 mockito 를 kotlin 에서 대체하는 mocking lib 이다.   
+Web Controller 테스트를 위한 준비작업으로 아래 의존성을 build.gradle 에 추가한다.   
+```gradle
+testImplementation 'io.mockk:mockk:1.13.8'
+```
+mockk 에 대한 자세한 정보는 공식 폼페이지를 확인 한다.   
+[mocking library for kotlin](https://mockk.io/)   
+Web Controller 구현과 테스트 코드는 chapter05 branch 내용을 참조 한다.   
    
 ### 5.2 RegisterPage 의 데이터를 서비스 포트의 규격에 맞게 변경
+
 ### 5.3 Service Port 를 이용해서 서비스 호출
 ### 5.4 RegistePage 가 요구하는 규격에 맞게 변경하여 반환

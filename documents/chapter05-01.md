@@ -3,7 +3,6 @@
 ## 웹 컨트롤러 (어뎁터)
 웹 컨트롤러는 RegisterPage(front-end)와의 통신 프로토콜을 제어 한다.   
 > RegisterPage 에서 전달 하는 데이터의 유효성 검사   
-> RegisterPage 의 데이터를 서비스 포트의 규격에 맞게 변경
 > Service Port 를 이용해서 서비스 호출
 > RegistePage 가 요구하는 규격에 맞게 변경하여 반환
 
@@ -97,7 +96,69 @@ mockk 에 대한 자세한 정보는 공식 폼페이지를 확인 한다.
 [mocking library for kotlin](https://mockk.io/)   
 Web Controller 구현과 테스트 코드는 chapter05 branch 내용을 참조 한다.   
    
-### 5.2 RegisterPage 의 데이터를 서비스 포트의 규격에 맞게 변경
+### 5.2 Service Port 를 이용해서 서비스 호출
+이제 Web Controller 에서 Core Service 를 호출하는 테스트를 작성하자.
+이미 존재하는 username/emailAddress 라면 409 Confict 오류를 발생시키고 해당 메시지를 반환 한다.   
+```kotlin
+@Test
+  fun `기 등록된 username 오류`() {
+    val existsUsername = RegistrationPayload("existsUsername", emailAddress, password)
+    client.postCall(existsUsername)
+      .expectStatus().is4xxClientError
+      .expectBody()
+      .jsonPath("$.message").isEqualTo(REGISTER_USERNAME_EXISTS)
+  }
+```
+기 등록된 username 을 확인 하기위해서는 Core Service 를 호출 해서 오류를 수신 할 수 있도록 구성 해야 한다.   
+Register 의 Core Service 의 Port 역할을 담당할 Interface 를 정의 한다.
+```kotlin
+  @Test
+  fun `기 등록된 username 오류`() {
+    val existsUsername = RegistrationPayload("existsUsername", emailAddress, password)
+    every { userService.register(existsUsername.toCommand()) } returns
+      Mono.error(RegistrationException(REGISTER_USERNAME_EXISTS))
 
-### 5.3 Service Port 를 이용해서 서비스 호출
-### 5.4 RegistePage 가 요구하는 규격에 맞게 변경하여 반환
+    client.postCall(existsUsername)
+      .expectStatus().isEqualTo(409)
+      .expectBody()
+      .jsonPath("$.message").isEqualTo(REGISTER_USERNAME_EXISTS)
+    verify(exactly = 1) { userService.register(existsUsername.toCommand()) }
+```
+이 코드의 핵심은 UserService Interface 를 정의하고 구현체는 아직 작성 하지 않은 부분이다.   
+UserService.register 은 아직 구현 되지 않았지만 mockk 를 이용해서 가상의 반환 값을 정의해서 Ctonroller 의 메소드는 테스트 할 수 있다.   
+위 코드에서는 정상 적인 반환 값이 아닌 오류를 발생 시키고 오류를 Web Browser 로 반환되는 과정을 테스트 했다.   
+중복 EmailAddress 테스트도 비슷한 과정으로 테스트 가능 하다.   
+
+### 5.3 RegistePage 가 요구하는 규격에 맞게 변경하여 반환
+UserService.register 메소드는 정상적으로 사용자 등록이 완료 되면 사용자 ID를 반환 한다.   
+반환된 ID 정보를 최종적으로 반환 할때는 아래와 같은 형식을 정의해서 반환 한다.   
+```json
+{
+  id: 100
+  message: "Register Success"
+}
+```
+최종 단계에서 Client 에 반환 되는 값의 정의와 구현이 Controller 의 마지막 역할이다.   
+ApiResponse 를 구현하고 이를 이용해서 최종 반환을 구현 하도록 한다.   
+```kotlin
+  @PostMapping(REGISTER)
+  fun register(
+    @Valid @RequestBody payload: RegistrationPayload
+  ): Mono<ResponseEntity<ApiResponse>> {
+    return payload.toMono().map {
+      payload.toCommand()
+    }.flatMap {
+      userService.register(it)
+    }.map {
+      ApiResponse.createApiResult(HttpStatus.CREATED, REGISTER_SUCCESS)
+        .add("id", it)
+    }.map {
+      ResponseEntity.status(201).body(it)
+    }.onErrorResume(RegistrationException::class.java) {
+      val apiResponse = ApiResponse.createApiResult(HttpStatus.CONFLICT, it.message!!)
+      ResponseEntity.status(HttpStatus.CONFLICT).body(apiResponse).toMono()
+    }
+  }
+```
+마지막으로 ResponseEntity 구성하는 부분을 간결하게 표현 할 수 있도록 핼퍼 클래스를 만들자.   
+최종 구현 코드는 chapter05 branch 를 참조 한다.   

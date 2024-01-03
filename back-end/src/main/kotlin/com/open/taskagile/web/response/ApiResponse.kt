@@ -15,4 +15,9 @@ class ApiResponse: HashMap<String, Any>() {
       return result
     }
   }
+
+  fun add(key:String, value: Any): ApiResponse {
+    this[key] = value
+    return this
+  }
 }

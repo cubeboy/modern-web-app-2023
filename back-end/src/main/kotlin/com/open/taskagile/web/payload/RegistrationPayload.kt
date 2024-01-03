@@ -1,7 +1,9 @@
 package com.open.taskagile.web.payload
 
+import com.open.taskagile.domain.application.commands.RegistrationCommand
 import com.open.taskagile.web.response.*
 import jakarta.validation.constraints.Pattern
+import java.util.*
 
 class RegistrationPayload(
   @field:Pattern(regexp="^[a-zA-Z0-9]{4,20}$",
@@ -15,4 +17,8 @@ class RegistrationPayload(
   @field:Pattern(regexp = "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[!@#$%^&*()-_=+\\[\\]{}|;:'\",.<>?/])[A-Za-z\\d!@#$%^&*()-_=+\\[\\]{}|;:'\",.<>?/]{6,128}$",
     message = REGISTER_PASSWORD_INVALID)
   val password:String
-)
+) {
+  fun toCommand(): RegistrationCommand {
+    return RegistrationCommand(username, emailAddress.lowercase(Locale.getDefault()), password)
+  }
+}

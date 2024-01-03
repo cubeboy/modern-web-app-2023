@@ -1,3 +1,5 @@
+@file:Suppress("NonAsciiCharacters")
+
 package com.open.taskagile.web.api
 
 import com.open.taskagile.domain.application.UserService
@@ -13,7 +15,6 @@ import org.json.JSONObject
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest
 import org.springframework.boot.test.context.TestConfiguration
@@ -26,7 +27,6 @@ import reactor.core.publisher.Mono
 @ExtendWith(MockKExtension::class)
 @WebFluxTest(RegisterController::class)
 class RegisterControllerTests {
-  private val log = LoggerFactory.getLogger(RegisterControllerTests::class.java)
   @Autowired
   private lateinit var client:WebTestClient
 
@@ -135,7 +135,7 @@ class RegisterControllerTests {
       .jsonPath("$.message").isEqualTo(REGISTER_SUCCESS)
   }
 
-  fun WebTestClient.postCall(payload: Any): ResponseSpec {
+  private fun WebTestClient.postCall(payload: Any): ResponseSpec {
     return this.post()
       .uri(REGISTER)
       .contentType(MediaType.APPLICATION_JSON)

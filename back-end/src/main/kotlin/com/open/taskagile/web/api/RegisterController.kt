@@ -7,8 +7,6 @@ import com.open.taskagile.web.response.ApiResponse
 import com.open.taskagile.web.response.REGISTER_SUCCESS
 import com.open.taskagile.web.response.Responsor
 import jakarta.validation.Valid
-import org.slf4j.LoggerFactory
-import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -18,7 +16,6 @@ import reactor.kotlin.core.publisher.toMono
 
 @RestController
 class RegisterController(val userService: UserService) {
-  private final val log = LoggerFactory.getLogger(RegisterController::class.java)
   @PostMapping(REGISTER)
   fun register(
     @Valid @RequestBody payload: RegistrationPayload

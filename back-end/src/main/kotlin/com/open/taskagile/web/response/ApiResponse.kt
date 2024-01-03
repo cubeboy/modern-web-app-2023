@@ -8,7 +8,7 @@ class ApiResponse: HashMap<String, Any>() {
     private const val MESSAGE_KEY = "message"
     private const val STATUS_KEY = "status"
 
-    public fun createApiResult(status:HttpStatus, message:String): ApiResponse {
+    fun createApiResult(status:HttpStatus, message:String): ApiResponse {
       val result = ApiResponse()
       result[STATUS_KEY] = status
       result[MESSAGE_KEY] = message

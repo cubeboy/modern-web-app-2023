@@ -6,7 +6,7 @@ import org.springframework.http.ResponseEntity
 class Responsor {
   companion object {
     fun createSuccess(id: Long, message: String): ResponseEntity<ApiResponse> {
-      val response = ApiResponse.createApiResult(HttpStatus.CREATED, REGISTER_SUCCESS)
+      val response = ApiResponse.createApiResult(HttpStatus.CREATED, message)
         .add("id", id)
       return ResponseEntity.status(201).body(response)
     }

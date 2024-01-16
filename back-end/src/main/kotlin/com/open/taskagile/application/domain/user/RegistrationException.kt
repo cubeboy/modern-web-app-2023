@@ -1,3 +1,3 @@
-package com.open.taskagile.domain.application.domain.user
+package com.open.taskagile.application.domain.user
 
 class RegistrationException(message:String) :Exception(message)

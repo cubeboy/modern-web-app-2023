@@ -1,7 +1,7 @@
 package com.open.taskagile.web.api
 
-import com.open.taskagile.domain.application.UserService
-import com.open.taskagile.domain.application.domain.user.RegistrationException
+import com.open.taskagile.application.UserService
+import com.open.taskagile.application.domain.user.RegistrationException
 import com.open.taskagile.web.payload.RegistrationPayload
 import com.open.taskagile.web.response.ApiResponse
 import com.open.taskagile.web.response.REGISTER_SUCCESS

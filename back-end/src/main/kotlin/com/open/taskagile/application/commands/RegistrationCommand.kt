@@ -1,4 +1,4 @@
-package com.open.taskagile.domain.application.commands
+package com.open.taskagile.application.commands
 
 data class RegistrationCommand(
   val username:String,

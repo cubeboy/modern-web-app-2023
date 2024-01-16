@@ -1,6 +1,6 @@
 package com.open.taskagile.web.payload
 
-import com.open.taskagile.domain.application.commands.RegistrationCommand
+import com.open.taskagile.application.commands.RegistrationCommand
 import com.open.taskagile.web.response.*
 import jakarta.validation.constraints.Pattern
 import java.util.*

@@ -1,25 +1,25 @@
 version: '3.8'
 services:
-  mariadb:
+  mariadb-local:
     image: mariadb:10
-    container_name: taskagile-mariadb
+    container_name: mariadb-local
     restart: always
     ports:
       - 10002:3306
     networks:
       taskagile-net:
         aliases:
-          - taskagile-mariadb
+          - mariadb-local
     environment:
       MYSQL_DATABASE: "task_agile"
       MYSQL_USER: "taskagile"
-      MYSQL_PASSWORD: "taskagile3306"
-      MYSQL_ROOT_PASSWORD: "taskagile3306"
+      MYSQL_PASSWORD: "taskagile10002"
+      MYSQL_ROOT_PASSWORD: "taskagile10002"
       TZ: Asiz:Seoul
     volumes:
       - ./dataRepository/mariadb/config/initdb.d:/docker-entrypoint-initdb.d:ro
       - ./dataRepository/mariadb/config/conf.d:/etc/mysql/conf.d:ro
-      - ./dataRepository/mariadb/data:/var/lib/mysql
+      - ./dataRepository/mariadb/data-local:/var/lib/mysql
 
   cloudbeaver:
     image: dbeaver/cloudbeaver:latest
@@ -34,7 +34,7 @@ services:
     environment:
       CB_SERVER_NAME: "taskagile-dbeaver"
       CB_ADMIN_NAME: "taskagile"
-      CB_ADMIN_PASSWORD: "taskagile3306"
+      CB_ADMIN_PASSWORD: "taskagile10001"
     volumes:
       - ./dataRepository/mariadb/workspace:/opt/cloudbeaver/workspace
 

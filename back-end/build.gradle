@@ -1,10 +1,18 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
+buildscript {
+  ext {
+    infobipVersion = "9.0.2"
+  }
+}
+
 plugins {
 	id 'org.springframework.boot' version '3.2.1'
 	id 'io.spring.dependency-management' version '1.1.4'
 	id 'org.jetbrains.kotlin.jvm' version '1.9.21'
 	id 'org.jetbrains.kotlin.plugin.spring' version '1.9.21'
+  id 'org.jetbrains.kotlin.plugin.jpa' version '1.8.22'
+  id "org.jetbrains.kotlin.kapt" version "1.9.22"
 }
 
 group = 'com.open'
@@ -34,6 +42,22 @@ dependencies {
   testImplementation 'com.h2database:h2'
   testImplementation 'io.r2dbc:r2dbc-h2'
   testImplementation 'io.mockk:mockk:1.13.8'
+
+  implementation "com.infobip:infobip-spring-data-r2dbc-querydsl-boot-starter:${infobipVersion}"
+  kapt "com.infobip:infobip-spring-data-jdbc-annotation-processor-common:${infobipVersion}"
+}
+
+def querydslDir = "$buildDir/generated/querydsl"
+sourceSets {
+  main.java.srcDirs += [ querydslDir ]
+}
+
+tasks.withType(JavaCompile) {
+  options.generatedSourceOutputDirectory = file(querydslDir)
+}
+
+clean.doLast {
+  file(querydslDir).deleteDir()
 }
 
 tasks.withType(KotlinCompile) {

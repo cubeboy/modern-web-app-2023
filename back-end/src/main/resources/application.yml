@@ -1,1 +1,11 @@
+spring:
+  r2dbc:
+    url: r2dbc:mariadb://localhost:10002/task_agile
+    username: taskagile
+    password: taskagile10002
 
+logging:
+  level:
+    org:
+      springframework:
+        r2dbc: DEBUG

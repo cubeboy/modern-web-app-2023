@@ -10,7 +10,7 @@ import com.open.taskagile.application.events.EventPublisher
 import com.open.taskagile.infra.messages.UserNotificationType
 import com.open.taskagile.infra.messages.UserNotifier
 import com.open.taskagile.infra.repository.UserRepository
-import com.open.taskagile.infra.repository.entity.User
+import com.open.taskagile.infra.repository.entity.Users
 import com.open.taskagile.web.response.REGISTER_EMAIL_ADDRESS_EXISTS
 import com.open.taskagile.web.response.REGISTER_USERNAME_EXISTS
 import io.mockk.*
@@ -48,7 +48,7 @@ class UserServiceImplTests {
   fun `중복된 Username 등록 오류`() {
     val command = RegistrationCommand("existsUsername", emailAddress, password)
     every { userRepository.findByUsernameOrEmailAddress(command.username, command.emailAddress) } returns
-      User(command.username, "otherUser@taskagile.com").toMono()
+      Users(username = command.username, emailAddress = "otherUser@taskagile.com", password = "").toMono()
     val mono = userService.register(command)
     mono.test()
       .expectSubscription()
@@ -67,7 +67,7 @@ class UserServiceImplTests {
   fun `중복된 EmailAddress 등록 오류`() {
     val command = RegistrationCommand(username, "existsUser@taskagile.com", password)
     every { userRepository.findByUsernameOrEmailAddress(username, command.emailAddress) } returns
-      User("otherUsername", command.emailAddress).toMono()
+      Users(username = "otherUsername", emailAddress = command.emailAddress, password = "").toMono()
 
     val id = userService.register(command)
     id.test()

@@ -1,3 +1,4 @@
-/dataRepository/mariadb/data
+/dataRepository/mariadb/data-local
+/dataRepository/mariadb/data-test
 /dataRepository/mariadb/workspace
 .vscode

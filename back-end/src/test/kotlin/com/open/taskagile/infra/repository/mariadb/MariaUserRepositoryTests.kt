@@ -3,6 +3,7 @@
 package com.open.taskagile.infra.repository.mariadb
 
 import com.infobip.spring.data.r2dbc.EnableQuerydslR2dbcRepositories
+import com.open.taskagile.config.TestMariadbConfig
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.data.r2dbc.DataR2dbcTest

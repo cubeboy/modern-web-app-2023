@@ -1,4 +1,4 @@
-package com.open.taskagile.infra.repository.mariadb
+package com.open.taskagile.config
 
 import com.querydsl.sql.MySQLTemplates
 import com.querydsl.sql.SQLTemplates

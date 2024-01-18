@@ -29,5 +29,3 @@ class MariaUserRepository(
     }.first().switchIfEmpty { Mono.empty() }
   }
 }
-
-interface IUserRepository: QuerydslR2dbcRepository<Users, Long>

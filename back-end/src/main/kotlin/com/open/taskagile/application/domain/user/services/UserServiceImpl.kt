@@ -10,10 +10,12 @@ import com.open.taskagile.infra.messages.UserNotifier
 import com.open.taskagile.infra.repository.UserRepository
 import com.open.taskagile.web.response.REGISTER_EMAIL_ADDRESS_EXISTS
 import com.open.taskagile.web.response.REGISTER_USERNAME_EXISTS
+import org.springframework.stereotype.Service
 import reactor.core.publisher.Mono
 import reactor.kotlin.core.publisher.switchIfEmpty
 import reactor.kotlin.core.publisher.toMono
 
+@Service
 class UserServiceImpl(
   private val userRepository: UserRepository,
   private val eventPublisher: EventPublisher,
@@ -35,7 +37,7 @@ class UserServiceImpl(
         userRepository.register(command.username, command.emailAddress, command.password)
       }
       .map {
-        val event = UserRegisteredEvent(it)
+        val event = UserRegisteredEvent(this, it)
         eventPublisher.publish(event)
         it
       }.map {

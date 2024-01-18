@@ -1,6 +1,6 @@
 package com.open.taskagile.application.events
 
-import java.io.Serializable
-import java.util.*
+import org.springframework.context.ApplicationEvent
 
-abstract class DomainEvent(val id: Long, val cratedDate: Date = Date()): Serializable
+abstract class DomainEvent(source: Any, val userId: Long):
+  ApplicationEvent(source)

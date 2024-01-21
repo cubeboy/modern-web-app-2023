@@ -1,24 +1,24 @@
 @file:Suppress("NonAsciiCharacters")
 
-package com.open.taskagile.infra.repository.mariadb
+package com.open.taskagile.infra.repository.r2dbc
 
-import com.infobip.spring.data.r2dbc.EnableQuerydslR2dbcRepositories
-import com.open.taskagile.config.TestMariadbConfig
+import com.open.taskagile.config.TestR2dbcConfig
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.data.r2dbc.DataR2dbcTest
+import org.springframework.data.r2dbc.repository.config.EnableR2dbcRepositories
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
 import reactor.kotlin.test.test
 
 @Suppress("UnusedEquals")
 @DataR2dbcTest
-@EnableQuerydslR2dbcRepositories
-@ContextConfiguration(classes = [TestMariadbConfig::class])
+@EnableR2dbcRepositories
+@ContextConfiguration(classes = [TestR2dbcConfig::class])
 @ActiveProfiles("test")
-class MariaUserRepositoryTests {
+class R2DbcUserRepositoryTests {
   @Autowired
-  lateinit var userRepository: MariaUserRepository
+  lateinit var userRepository: R2DbcUserRepository
 
   @Test
   fun `username 으로 user 찾기 성공`() {

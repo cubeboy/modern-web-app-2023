@@ -1,4 +1,4 @@
-Integration & Test
+# Integration & Test
 ---
 지금까지 작성된 코드는 단위 테스트로서는 잘 작동하는 상태이다.   
 하지만 Interface 만 존재하고 구현체가 없기때문에 Application 을 실행 했을때 오류가 발생 한다.   
@@ -21,4 +21,10 @@ Integration & Test
 }
 ```
 actuator 는 이후에 prometheus 를 이용한 모니터링 구성 단게에서 자세하게 설명한다.   
-
+   
+---
+## R2DBC 구현 변경
+초기 단계에서는 infobip.querydsl 을 이용해서 구현 하려 하였으나 구현하면서 테스트 하는 과정에서 여러가지 문제가 계속해서 발생해서 querydsl 구현을 제거하고 r2dbc 구현으로 대체 하기로 한다.   
+현재 구현된 Repository 구현을 R2dbc 구현으로 변경한다.   구현 코드 내용은 branch chapter05 의 내용을 참조 한다.   
+   
+---

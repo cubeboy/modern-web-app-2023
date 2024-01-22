@@ -4,6 +4,7 @@ package com.open.taskagile.domain.user.services
 
 import com.open.taskagile.application.UserService
 import com.open.taskagile.application.commands.RegistrationCommand
+import com.open.taskagile.application.domain.common.security.PasswordEncryptor
 import com.open.taskagile.application.domain.user.RegistrationException
 import com.open.taskagile.application.domain.user.services.UserServiceImpl
 import com.open.taskagile.application.events.EventPublisher
@@ -33,6 +34,8 @@ class UserServiceImplTests {
   private lateinit var eventPublisher: EventPublisher
   @MockK(relaxed = true)
   private lateinit var userNotifier: UserNotifier
+  @MockK(relaxed = true)
+  private lateinit var passwordEncryptor: PasswordEncryptor
 
   private val username = "testuser"
   private val emailAddress = "testuser@taskagile.com"
@@ -41,7 +44,7 @@ class UserServiceImplTests {
   @BeforeEach
   fun setUp() {
     MockKAnnotations.init(this)
-    userService = UserServiceImpl(userRepository, eventPublisher, userNotifier)
+    userService = UserServiceImpl(userRepository, eventPublisher, userNotifier, passwordEncryptor)
   }
 
   @Test
@@ -58,6 +61,7 @@ class UserServiceImplTests {
       }
       .verify()
 
+    verify(exactly = 0) { passwordEncryptor.encrypt(any()) }
     verify(exactly = 0) { userRepository.register(any(), any(), any()) }
     verify(exactly = 0) { eventPublisher.publish(any()) }
     verify(exactly = 0) { userNotifier.notify(any(), UserNotificationType.USER_REGISTERED) }
@@ -78,6 +82,7 @@ class UserServiceImplTests {
       }
       .verify()
 
+    verify(exactly = 0) { passwordEncryptor.encrypt(any()) }
     verify(exactly = 0) { userRepository.register(any(), any(), any()) }
     verify(exactly = 0) { eventPublisher.publish(any()) }
     verify(exactly = 0) { userNotifier.notify(any(), UserNotificationType.USER_REGISTERED) }
@@ -86,11 +91,13 @@ class UserServiceImplTests {
   @Test
   fun `사용자 등록 성공`() {
     val userId = 999L
+    val encryptedPassword = "encryptedPassword"
     val command = RegistrationCommand(username, emailAddress, password)
 
     every { userRepository.findByUsernameOrEmailAddress(command.username, command.emailAddress) } returns
       Mono.empty()
-    every { userRepository.register(command.username, command.emailAddress, command.password)} returns
+    every { passwordEncryptor.encrypt(command.password) } returns encryptedPassword.toMono()
+    every { userRepository.register(command.username, command.emailAddress, encryptedPassword) } returns
       userId.toMono()
     val id = userService.register(command)
     id.test()
@@ -100,7 +107,8 @@ class UserServiceImplTests {
 
     verifySequence {
       userRepository.findByUsernameOrEmailAddress(username, emailAddress)
-      userRepository.register(username, emailAddress, password)
+      passwordEncryptor.encrypt(command.password)
+      userRepository.register(username, emailAddress, encryptedPassword)
       eventPublisher.publish(any())
       userNotifier.notify(userId, UserNotificationType.USER_REGISTERED)
     }

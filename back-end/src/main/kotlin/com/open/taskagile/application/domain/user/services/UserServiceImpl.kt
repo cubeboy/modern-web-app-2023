@@ -2,6 +2,7 @@ package com.open.taskagile.application.domain.user.services
 
 import com.open.taskagile.application.UserService
 import com.open.taskagile.application.commands.RegistrationCommand
+import com.open.taskagile.application.domain.common.security.PasswordEncryptor
 import com.open.taskagile.application.domain.user.RegistrationException
 import com.open.taskagile.application.domain.user.events.UserRegisteredEvent
 import com.open.taskagile.application.events.EventPublisher
@@ -19,7 +20,8 @@ import reactor.kotlin.core.publisher.toMono
 class UserServiceImpl(
   private val userRepository: UserRepository,
   private val eventPublisher: EventPublisher,
-  private val userNotifier: UserNotifier
+  private val userNotifier: UserNotifier,
+  private val passwordEncryptor: PasswordEncryptor
 ): UserService {
   override fun register(command: RegistrationCommand): Mono<Long> {
     return command.toMono()
@@ -34,7 +36,10 @@ class UserServiceImpl(
         }
       }
       .switchIfEmpty {
-        userRepository.register(command.username, command.emailAddress, command.password)
+        passwordEncryptor.encrypt(command.password)
+          .flatMap {
+            userRepository.register(command.username, command.emailAddress, it)
+          }
       }
       .map {
         val event = UserRegisteredEvent(this, it)

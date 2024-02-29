@@ -4,6 +4,7 @@ package com.open.taskagile.web.api
 
 import com.open.taskagile.application.UserService
 import com.open.taskagile.application.domain.user.RegistrationException
+import com.open.taskagile.configuration.SecurityConfiguration
 import com.open.taskagile.web.payload.RegistrationPayload
 import com.open.taskagile.web.response.*
 import io.mockk.MockKAnnotations
@@ -19,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Bean
+import org.springframework.context.annotation.Import
 import org.springframework.http.MediaType
 import org.springframework.test.web.reactive.server.WebTestClient
 import org.springframework.test.web.reactive.server.WebTestClient.ResponseSpec
@@ -26,6 +28,7 @@ import reactor.core.publisher.Mono
 
 @ExtendWith(MockKExtension::class)
 @WebFluxTest(RegisterController::class)
+@Import(SecurityConfiguration::class)
 class RegisterControllerTests {
   @Autowired
   private lateinit var client:WebTestClient

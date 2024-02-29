@@ -89,3 +89,9 @@ Application 작성을 위해서 Front/Back End 코드의 뼈대를 작성 한다
 > [Register Core Service](./documents/chapter05-02.md)   
 > [Register Repository Adapter](./documents/chapter05-03.md)   
 > [Integration & Test](./documents/chapter05-04.md)
+
+### 6. OAUTH2 & JWT 인증 처리
+task-agile 프로젝트의 사용자 인증 구현은 Spring Framework 에서 제공하는 OAUTH2.0 프로토콜을 구현 한다.   
+jwt 를 이용한 클라이언트 토큰 기반 인증을 구현하며 단위 테스트(UNIT TEST)를 이용한 인증 테스트를 구현 한다.   
+> [Spring Security Dependency](./documents/chapter06-01.md)   
+> [JWT Token Generate](./documents/chapter06-02.md)   

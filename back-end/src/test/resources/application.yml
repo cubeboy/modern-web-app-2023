@@ -4,6 +4,13 @@ spring:
 
 logging:
   level:
+    com:
+      open:
+        taskagile: DEBUG
     org:
       springframework:
         r2dbc: DEBUG
+
+jwt:
+  secretKey: ${SECRET_KEY}
+  validityInMs: 36000

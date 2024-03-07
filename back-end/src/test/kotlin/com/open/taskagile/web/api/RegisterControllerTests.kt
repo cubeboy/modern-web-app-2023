@@ -17,6 +17,8 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.autoconfigure.security.reactive.ReactiveSecurityAutoConfiguration
+import org.springframework.boot.autoconfigure.security.reactive.ReactiveUserDetailsServiceAutoConfiguration
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Bean
@@ -27,8 +29,13 @@ import org.springframework.test.web.reactive.server.WebTestClient.ResponseSpec
 import reactor.core.publisher.Mono
 
 @ExtendWith(MockKExtension::class)
-@WebFluxTest(RegisterController::class)
-@Import(SecurityConfiguration::class)
+@WebFluxTest(
+  controllers = [RegisterController::class],
+  excludeAutoConfiguration = [
+    ReactiveUserDetailsServiceAutoConfiguration::class,
+    ReactiveSecurityAutoConfiguration::class
+  ]
+)
 class RegisterControllerTests {
   @Autowired
   private lateinit var client:WebTestClient

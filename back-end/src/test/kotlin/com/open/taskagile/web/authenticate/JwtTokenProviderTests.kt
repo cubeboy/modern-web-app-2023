@@ -1,5 +1,6 @@
 package com.open.taskagile.web.authenticate
 
+import com.open.taskagile.configuration.ApplicationConfiguration
 import com.open.taskagile.configuration.JwtProperties
 import io.jsonwebtoken.JwtException
 import io.jsonwebtoken.Jwts
@@ -11,17 +12,21 @@ import org.junit.jupiter.api.assertThrows
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.context.properties.ConfigurationPropertiesScan
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.authority.AuthorityUtils
 import org.springframework.security.core.userdetails.User
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.test.context.ActiveProfiles
+import org.springframework.test.context.ContextConfiguration
 import java.nio.charset.StandardCharsets
 import java.util.*
 import java.util.stream.Collectors
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
+@ContextConfiguration(classes = [ApplicationConfiguration::class])
+@ConfigurationPropertiesScan("com.open.taskagile.configuration.JwtProperties")
 @ActiveProfiles("test")
 class JwtTokenProviderTests {
   val log: Logger = LoggerFactory.getLogger(JwtTokenProviderTests::class.java)

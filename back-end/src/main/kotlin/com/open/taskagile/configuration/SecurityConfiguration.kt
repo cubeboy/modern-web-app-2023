@@ -1,8 +1,11 @@
 package com.open.taskagile.configuration
 
+import com.open.taskagile.web.authenticate.JwtTokenAuthenticationFilter
+import com.open.taskagile.web.authenticate.JwtTokenProvider
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity
+import org.springframework.security.config.web.server.SecurityWebFiltersOrder
 import org.springframework.security.config.web.server.ServerHttpSecurity
 import org.springframework.security.web.server.SecurityWebFilterChain
 
@@ -14,14 +17,16 @@ class SecurityConfiguration {
   }
 
   @Bean
-  fun springWebFilterChain(http:ServerHttpSecurity): SecurityWebFilterChain {
+  fun springWebFilterChain(http:ServerHttpSecurity, tokenProvider: JwtTokenProvider): SecurityWebFilterChain {
     return http
+      .csrf{ it.disable() }
+      .httpBasic { it.disable() }
       .authorizeExchange { exchange ->
         exchange
           .pathMatchers(*PUBLIC).permitAll()
           .anyExchange().permitAll()
       }
-      .csrf{ it.disable() }
+      .addFilterAt(JwtTokenAuthenticationFilter(tokenProvider), SecurityWebFiltersOrder.HTTP_BASIC)
       .build()
   }
 }

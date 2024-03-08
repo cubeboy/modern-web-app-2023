@@ -42,8 +42,8 @@ class SecurityConfiguration {
       .authorizeExchange { exchange ->
         exchange
           .pathMatchers(*PUBLIC).permitAll()
-          .pathMatchers("/me").authenticated()
-          .pathMatchers("/users/{user}/**").access(this::currentUserMatcherPath)
+          .pathMatchers("/api/me").authenticated()
+          .pathMatchers("/api/users/{user}/**").access(this::currentUserMatcherPath)
           .anyExchange().authenticated()
       }
       .addFilterAt(JwtTokenAuthenticationFilter(tokenProvider), SecurityWebFiltersOrder.HTTP_BASIC)

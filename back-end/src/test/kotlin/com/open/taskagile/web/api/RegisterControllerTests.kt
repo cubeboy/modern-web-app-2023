@@ -147,7 +147,7 @@ class RegisterControllerTests {
 
   private fun WebTestClient.postCall(payload: Any): ResponseSpec {
     return this.post()
-      .uri(REGISTER)
+      .uri(API_ROOT + REGISTER)
       .contentType(MediaType.APPLICATION_JSON)
       .bodyValue(payload)
       .exchange()
